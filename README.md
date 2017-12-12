@@ -1,15 +1,17 @@
 ## Synopsis
-This includes the brief PowerPoint file, code, and data files used during a talk at the Winston-Salem R Users Group MeetUp held on December 11, 2017. The talk demonstrated image processing with the `EBImage` package from the bioconductor. Once the repository is downloaded the two R scripts ('imaging_demo script.R' and 'case studies script.R') can be used to recreate the talk. Note that the scripts are meant to be executed line-by-line and are not meant to be sourced. There are frequent calls to interact with the operator.  
+This repository contains the brief PowerPoint file, scripts, support code, and data files used for a talk on image analysis at the Winston-Salem R Users Group MeetUp held on December 11, 2017. The talk demonstrated image processing with the `EBImage` package from the bioconductor.
 
-Included here is a folder representing package still under development, `virustiter`. The folder needs to be downloaded and then should be loaded locally with `load_all()` of the `devtools` package. This is necessary only to run the final example in the 'case studies script.R'.
+After downloading the repository, the two R scripts (`imaging_demo script.R` and `case studies script.R`) can be used to recreate the talk. Note that these scripts are meant to be executed line-by-line and are not meant to be sourced. They require frequent input from the operator. A few additional packages are required. These are wrapped by a call to `require()` with a message indicating which package needs to be installed. 
 
-Many thanks are due to the creators and maintainers of EBImage (Gregoire Pau, Florian Fuchs, Oleg Sklyar, Michael Boutros and Wolfgang Huber) as well as Wayne Rasband, creator of ImageJ. 
+Included here is a directory representing package still under development, `virustiter`. The directory will be loaded locally with `load_all()` of the `devtools` package. This is necessary only to run the final example in `case studies script.R`.
+
+Many thanks are due to the creators and maintainers of `EBImage` (Gregoire Pau, Florian Fuchs, Oleg Sklyar, Michael Boutros and Wolfgang Huber) as well as Wayne Rasband, creator of ImageJ. 
 
 ## Contact
-David Ornelles
-Wake Forest School of Medicine
-Department of Microbiology and Immunology
-575 Patterson Ave
+David Ornelles  
+Wake Forest School of Medicine  
+Department of Microbiology and Immunology  
+575 Patterson Ave  
 Winston-Salem, NC 27101
 
 ## License
