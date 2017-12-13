@@ -17,13 +17,13 @@
 #
 ###############################################################################
 ##
-## Set 'home' to path with 'imaging_demo'
+## Set 'home' to path with 'imaging-talk'
 ## Here, it runs from my local github directories 
 ##
 ###############################################################################
   home <- gsub("\\", "/", path.expand("~"), fixed = TRUE)
   home <- sub("/Documents", "", home)   # adjust for Windows
-  home <- file.path(home, "/Documents/github/imaging_demo")
+  home <- file.path(home, "Documents/github/imaging-talk")
 
 # library and helper functions
   if (!require(EBImage))
@@ -34,7 +34,7 @@
 ##
 ## Image processing basics
 ##
-## Plot windows are opened at the upper left with a fixed size to accomodate
+## Plot windows are opened at the upper left with a fixed size to accommodate
 ## demonstrating this on a little laptop computer. The position specification
 ## (xpos, ypos) may only work on Windows platforms. 
 ##
