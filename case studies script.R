@@ -318,8 +318,9 @@
   plot(circ ~ area, df)         # show circularity and area
   v <- locator(type = "l")      # draw polygon around points, right-click stops 
 
-# identify the points in polygon and check against plot
-  sel <- pnpoly(df[c("area","circ")], v)  # identify points within polygon
+# identify the points in polygon and check against plot by looking for
+# a tight cluster of small but not too small points close to circ = 1
+  sel <- pnpoly(df[c("area", "circ")], v)  # identify points within polygon
   plot(1 - xt)      # show black on white image
   points(df[sel,], col = "red", pch = 16, cex = 1.2) # add red dots to check
   res <- df[sel,]   # keep only selected in 'res'
@@ -437,7 +438,7 @@
   z <- z[,,,c(1,3,2,4)] # rorder to place on same row
   plot(z, all = T)
 
-# get nuclear masks (median, blur, threshold, fill, etc.. in one function)
+# one function to get nuclear masks (median, blur, threshold, fill, etc.)
   nm0 <- nucMask(nuc)
   z <- combine(N, colorLabels(nm0))[,,,c(1,3,2,4)]
   plot(z, all = T)  # not obvious, but small fragments captured
@@ -504,7 +505,7 @@
   (res <- tally(df))          # assembly results data frame
   fm <- getFit(res)           # perform Poisson fit with glm()
   fm                          # glm fit
-  plotFit(fm)                 # show fit with results 162 virus particles per IU
+  plotFit(fm)                 # show fit with results: 162 VP per IU
 
 ##
 ## Done!
