@@ -1,12 +1,12 @@
 ###############################################################################
 ##
-## Set 'home' to path with 'imaging_demo'
+## Set 'home' to path with 'imaging-talk'
 ## Here, it runs from my local github directories 
 ##
 ###############################################################################
   home <- gsub("\\", "/", path.expand("~"), fixed = TRUE)
   home <- sub("/Documents", "", home)   # adjust for Windows
-  home <- file.path(home, "/Documents/github/imaging_demo")
+  home <- file.path(home, "Documents/github/imaging-talk")
 
 # library and helper functions
   if (!require(EBImage))
@@ -51,7 +51,7 @@
   lines(w*c(1,4) + 20*c(1,-1), c(-40, -40), lwd = 2, xpd = TRUE)
   text(xx[3], -60, "RNA Samples", cex = 1.5, xpd = TRUE)
 
-# draw lines around image based on dimensions of image and savef
+# draw lines around image based on dimensions of image and save
   dm <- dim(img) + 1
   rect(0, dm[2], dm[1], 0, border = 1, lwd = 4, lend = "square", xpd = TRUE)
   dev.print(jpeg, file="rna figure.jpg", res=300, unit="in",
@@ -297,7 +297,7 @@
 
 # look more closely at rotated square
   plot(squares[581:596, 248:262], interp = FALSE)
-  726 * sqrt(2)   # shows failure to measure Euclidian distance
+  726 * sqrt(2)   # shows failure to measure Euclidean distance
   dev.off()
 ##
 ## relevant to the problem at hand, which is to find little circles
@@ -322,7 +322,6 @@
   sel <- pnpoly(df[c("area","circ")], v)  # identify points within polygon
   plot(1 - xt)      # show black on white image
   points(df[sel,], col = "red", pch = 16, cex = 1.2) # add red dots to check
-
   res <- df[sel,]   # keep only selected in 'res'
 
 #
@@ -405,7 +404,7 @@
 ##
 ###############################################################################
 
-# use code moved from Github repository (devtools already loaded)
+# use code moved from Github repository (devtools needed)
   if (!require(devtools))
     warning("'devtools' package must be installed to proceed")
   load_all(file.path(home, "virustiter"))
@@ -461,7 +460,7 @@
   plot(obj, all = T, nx = 1) # all fragments around the edges
 
 # nuclear masks used to determine the staining intensity in e1a image
-# the faint fluorescence is enhanced by gamma and brightness 
+# faint fluorescence is enhanced by gamma and brightness adjustments
   obj <- paintObjects(nm, E^0.4 - 0.1, col = "magenta")
   plot(obj, all = TRUE); mtext("Nuclei on E1A (B/C adjusted)", 3)
 
@@ -483,12 +482,12 @@
   df$pos <- df$val > cutoff
   xtabs(~ pos, df)
 
-# use this value to highlight positive cells
+# use this value to create a mask for positive cells
   val <- lapply(1:2, function(i) computeFeatures.basic(nm[,,i], e1a[,,i])[,1])
   neg <- lapply(val, function(v) which(v < cutoff))
   nm.pos <- rmObjects(nm, neg)
 
-# use gamma adjustment of 0.4 to increase brightness of dim pixels
+# use gamma adjustment of 0.4 with brightness adjustment again
   obj <- paintObjects(nm.pos, y^0.4 - 0.1, col = "gray")
   plot(obj, all = TRUE); mtext("Positive Cells (B/C adjusted)", 3)
 
@@ -500,12 +499,12 @@
   df <- parseImages(f, display = FALSE) # read all images in enclosing directory
   (pd <- read.csv(fpd))       # read phenotype data (about infection)
   df <- mergePdata(pd, df)    # join phenotype and image data
-  cut <- getCut(df, mult = 3) # programatically determine cutoff
+  cut <- getCut(df, mult = 3) # programmatically determine cutoff
   df <- score(df, cut)        # add positives to data
   (res <- tally(df))          # assembly results data frame
   fm <- getFit(res)           # perform Poisson fit with glm()
   fm                          # glm fit
-  plotFit(fm)                 # show fit with results
+  plotFit(fm)                 # show fit with results 162 virus particles per IU
 
 ##
 ## Done!
