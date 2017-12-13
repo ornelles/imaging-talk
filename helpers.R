@@ -110,9 +110,9 @@ extract <- function(x, plot = TRUE, col = "white") {
 ###############################################################################
 
 crop <- function(img, border = 1, fill = 0) {
+	img <- cbind(0, img, 0)   # ensure an edge exists!
+	img <- rbind(0, img, 0)
 	mask <- img > 0
-	mask <- cbind(FALSE, mask, FALSE)	# ensure an edge exists!
-	mask <- rbind(FALSE, mask, FALSE)
 
 	xb <- apply(mask, 1, Negate(any))	# blank rows
 	xr <- rle(xb)
