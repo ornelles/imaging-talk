@@ -107,28 +107,28 @@
 ##
 ###############################################################################
 
-  crop <- function(img, border = 1, fill = 0) {
-    mask <- img > 0
-    mask <- cbind(FALSE, mask, FALSE) # ensure an edge exists!
-    mask <- rbind(FALSE, mask, FALSE)
+crop <- function(img, border = 1, fill = 0) {
+	img <- cbind(0, img, 0)   # ensure an edge exists!
+	img <- rbind(0, img, 0)
+	mask <- img > 0
 
-    xb <- apply(mask, 1, Negate(any)) # blank rows
-    xr <- rle(xb)
-    nx <- xr$lengths * xr$values
-    ix <- seq_len(dim(mask)[1])
-    ix <- intersect(tail(ix, -head(nx, 1)), head(ix, -tail(nx, 1)))
+	xb <- apply(mask, 1, Negate(any))	# blank rows
+	xr <- rle(xb)
+	nx <- xr$lengths * xr$values
+	ix <- seq_len(dim(mask)[1])
+	ix <- intersect(tail(ix, -head(nx, 1)), head(ix, -tail(nx, 1)))
 
-    yb <- apply(mask, 2, Negate(any)) # blank columns
-    yr <- rle(yb)
-    ny <- yr$lengths * yr$values
-    iy <- seq_len(dim(mask)[2])
-    iy <- intersect(tail(iy, -head(ny, 1)), head(iy, -tail(ny, 1)))
+	yb <- apply(mask, 2, Negate(any))	# blank columns
+	yr <- rle(yb)
+	ny <- yr$lengths * yr$values
+	iy <- seq_len(dim(mask)[2])
+	iy <- intersect(tail(iy, -head(ny, 1)), head(iy, -tail(ny, 1)))
 
-    dm <- c(length(ix), length(iy))
-    z <- Image(fill, dim = dm + 2 * border) 
-    z[border + seq_along(ix), border + seq_along(iy)] <- img[ix, iy]
-    return(z)
-  }
+	dm <- c(length(ix), length(iy))
+	z <- Image(fill, dim = dm + 2 * border) 
+	z[border + seq_along(ix), border + seq_along(iy)] <- img[ix, iy]
+	return(z)
+}
 
 ###############################################################################
 ##
