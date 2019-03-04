@@ -18,17 +18,16 @@
 ###############################################################################
 ##
 ## Set 'home' to path with 'imaging-talk'
-## Here, it runs from my local github directories 
+## The example here is specific for my office computer...
 ##
 ###############################################################################
-  home <- gsub("\\", "/", path.expand("~"), fixed = TRUE)
-  home <- sub("/Documents", "", home)   # adjust for Windows
-  home <- file.path(home, "Documents/github/imaging-talk")
+  home <- "~/Documents/github/imaging-talk"
 
 # library and helper functions
   if (!require(EBImage))
     stop("EBImage must be installed to proceed")
   setwd(home)
+  source("helpers.R")
 
 ###############################################################################
 ##
@@ -158,15 +157,18 @@
 ###############################################################################
 #
 # straighten with user interaction and locator()
+# use mouse to select two distant points on the horizon
   dev.new(width = 7.5, height = 6, xpos = 5, ypos = 5); plot(img)
   p <- locator(2, type = "l") # two points along horizon
 
+# after the image is re-drawn, click once on the new horizon
   delta <- lapply(p, diff)    # need delta-y over delta-x
   angle <- 180 * atan2(delta$y, delta$x) / pi # convert radians to degrees
   img <- rotate(img, angle = - angle)
   plot(img)
   abline(h = locator(1)$y)    # test rotation with horizontal line
 
+# select 4 points of the actual image an eliminate black regions
   (p <- locator(4))           # identify 4 corners of image
   (p <- lapply(p, round))     # round to integers
   (p <- lapply(p, sort))      # sort x, y values
@@ -175,7 +177,7 @@
   img2 <- img[idx$x, idx$y, ] # crop
   plot(img2)
 
-# select top left, bottom right of little bay to create inset
+# Now select top left, bottom right of little bay to create inset
   p <- locator(2)  # top left, bottom right
 
   p <- lapply(p, round) # convert to integers
@@ -200,12 +202,14 @@
   p1  # upper left corner
   p2  # lower right corner
 
-# create index and check that target on original image is acceptable
+# create index and plot this location from the original image 
+# to ensure that it is acceptable
   idx <- mapply(seq, from = p1, to = p2, SIMPLIFY = FALSE)
   plot(img2[idx$x, idx$y, ])
 
+###############################################################################
 ##
-## discuss quirks of mapply()
+## discuss quirks of mapply() - use Map() instead!!!
 ##
   mapply(seq, c(1, 11, 21), c(3, 13, 23))
 ## vs
@@ -215,6 +219,7 @@
 ##
 ## return to talk
 ##
+###############################################################################
 
 # copy image to new object and replace selected area
   img3 <- img2

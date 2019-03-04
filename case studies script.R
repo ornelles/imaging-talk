@@ -1,12 +1,10 @@
 ###############################################################################
 ##
 ## Set 'home' to path with 'imaging-talk'
-## Here, it runs from my local github directories 
+## The example here is specific for my office computer...
 ##
 ###############################################################################
-  home <- gsub("\\", "/", path.expand("~"), fixed = TRUE)
-  home <- sub("/Documents", "", home)   # adjust for Windows
-  home <- file.path(home, "Documents/github/imaging-talk")
+  home <- "~/Documents/github/imaging-talk"
 
 # library and helper functions
   if (!require(EBImage))
@@ -18,12 +16,18 @@
 ##
 ## Gel labeling exercise with straightening, cropping
 ##
+## This loads a skewed image and asks the interacts with the user to choose
+## two points that define the horizontal. Next, the user chooses two points
+## to crop the image. Next the leading edge of the 1st and 4th lane are 
+## selected in order to calculate labels.  
+##
 ###############################################################################
 
 # read RNA gel image
   setwd(file.path(home, "rna"))
   img <- readImage("gel.tif")
-  dev.new(width = 7.5, height = 4, xpos = 5, ypos = 5); plot(img)
+  dev.new(width = 7.5, height = 4, xpos = 5, ypos = 5)
+  plot(img)
 
 # straighten image
   p <- locator(2, type = "l")	# choose 2 points along wells
@@ -39,7 +43,8 @@
   p <- toIdx(p)        # round, sort, convert to integer sequence
   img <- img[p$x, p$y]
   dev.off()
-  dev.new(width = 6.5, height = 5, xpos = 5, ypos = 5); plot(img, margin = 80)
+  dev.new(width = 6.5, height = 5, xpos = 5, ypos = 5)
+  plot(img, margin = 80)
 
 # select leading edge of 1st and 4th lanes to locate 4 labels
   w <- diff(locator(2)$x) / 3 # leading edge of 1st and 4th lanes
@@ -51,9 +56,11 @@
   lines(w*c(1,4) + 20*c(1,-1), c(-40, -40), lwd = 2, xpd = TRUE)
   text(xx[3], -60, "RNA Samples", cex = 1.5, xpd = TRUE)
 
-# draw lines around image based on dimensions of image and save
+# draw lines around image based on dimensions of image
   dm <- dim(img) + 1
   rect(0, dm[2], dm[1], 0, border = 1, lwd = 4, lend = "square", xpd = TRUE)
+
+# save as JPEG file
   dev.print(jpeg, file="rna figure.jpg", res=300, unit="in",
     width=dev.size()[1])
   dev.off()
@@ -76,6 +83,7 @@
 # background remains constant
   dev.new(width = 6.5, height = 3.2, xpos=5, ypos=5)
   plot(img[,,2:3], all = T)  # two views of yeast
+
   plot(img[,,1], all = TRUE) # brightfield image with no specimen
   dev.off()
 
@@ -85,7 +93,8 @@
   adj <- normalize(adj)   # rescale values in Image data
   apply(adj, 3, range)
   z <- combine(img[,,2:3], adj)
-  dev.new(width = 6.5, height = 6.5, xpos = 5, ypos = 5); plot(z, all = TRUE)
+  dev.new(width = 6.5, height = 6.5, xpos = 5, ypos = 5)
+  plot(z, all = TRUE)
   dev.off()
 
 ###############################################################################
@@ -99,7 +108,8 @@
   img.url <- "https://imagej.nih.gov/ij/images/embryos.jpg"
   img <- readImage(img.url)
 # NOTE: sample is JPEG. JPEG files are not generally appropriate for analysis
-  dev.new(width = 7.5, height = 6, xpos = 5, ypos = 5); plot(img)
+  dev.new(width = 7.5, height = 6, xpos = 5, ypos = 5)
+  plot(img)
 
 # create grayscale image to extract features
   x <- channel(img, "gray")
@@ -110,11 +120,13 @@
   hist(x, log = "y")        # two populations evident 
   abline(v = 0.45, col = 2)  # approximate break point at 0.45
   dev.off()
-  z <- combine(x, x < 0.45)  # identify pixels darker than 0.45
 
 # note blurred spot that is not an embryo but identified by global thresholding
-  dev.new(width = 9, height = 4, xpos = 5, ypos = 5); plot(z, all = TRUE)
-  mtext("original", line=3, adj=0.2); mtext("global threshold", line=3, adj=0.8)
+  dev.new(width = 9, height = 4, xpos = 5, ypos = 5)
+  z <- combine(x, x < 0.45)  # identify pixels darker than 0.45
+  plot(z, all = TRUE)
+  mtext("original", line=3, adj=0.2)
+  mtext("global threshold", line=3, adj=0.8)
   mark <- c(x0 = 575, y0 = 938, x1 = 670, y1 = 849) # arrow coordinates
   do.call(arrows, c(as.list(mark), len = 0.1, col = "yellow", lwd = 2))
   mark <- mark + c(dim(x)[1], 0, dim(x)[1], 0)
@@ -126,41 +138,48 @@
 # median filter to smooth noise
   xm <- medianFilter(x, 5)
   plot(combine(x, xm), all = TRUE)
-  mtext("original", line=3, adj=0.2); mtext("median filter", line=3, adj=0.8)
+  mtext("original", line=3, adj=0.2)
+  mtext("median filter", line=3, adj=0.8)
 
 # local threshold with default 5 x 5 rectangle and threshold of 0.01
 # here, a local threshold applied to dark objects creates a white border
 # around the object, creating a mask larger than the object
   xt <- thresh(xm)
   plot(combine(xm, xt), all = TRUE) # bright values above local background
-  mtext("median filter", line=3, adj=0.2); mtext("local threshold", line=3, adj=0.8)
+  mtext("median filter", line=3, adj=0.2)
+  mtext("local threshold", line=3, adj=0.8)
 
 # fill holes in binary objects produced by thresh()
   xf <- fillHull(xt)
   plot(combine(xt, xf), all = TRUE)
-  mtext("local threshold", line=3, adj=0.2); mtext("fill hull", line=3, adj=0.8)
+  mtext("local threshold", line=3, adj=0.2)
+  mtext("fill hull", line=3, adj=0.8)
 
 # opening = erode pixels on edges followed by dilating pixels on edges 
   xo <- opening(xf, makeBrush(11, "disc"))  # erode then dilate
   plot(combine(xf, xo), all = TRUE)
-  mtext("fill hull", line=3, adj=0.2); mtext("opening", line=3, adj=0.8)
+  mtext("fill hull", line=3, adj=0.2)
+  mtext("opening", line=3, adj=0.8)
 
 # distance map - replace each pixel with the distance to nearest background value
   xd <- distmap(xo)         
   plot(combine(xo, normalize(xd)), all = TRUE)
-  mtext("opening", line=3, adj=0.2); mtext("distance map", line=3, adj=0.8)
+  mtext("opening", line=3, adj=0.2)
+  mtext("distance map", line=3, adj=0.8)
 
 # separate joined objects by 'watershed' algorithm
   mask <- watershed(xd)
   plot(combine(toRGB(normalize(xd)), colorLabels(mask)), all = TRUE)
-  mtext("distance map", line=3, adj=0.2); mtext("watershed", line=3, adj=0.8)
+  mtext("distance map", line=3, adj=0.2)
+  mtext("watershed", line=3, adj=0.8)
 
 # if we want to further expand the mask, one could do so with the following code
   xo <- dilate(mask, makeBrush(21, "disc"))
   xd <- distmap(xo)
   big.mask <- watershed(xd)
   plot(combine(colorLabels(mask),colorLabels(big.mask)), all = TRUE)
-  mtext("original mask", line=3, adj=0.2); mtext("expanded", line=3, adj=0.8)
+  mtext("original mask", line=3, adj=0.2)
+  mtext("expanded", line=3, adj=0.8)
 
 # examine mask and a couple objects defined by mask
   print(mask, short = TRUE) # image object
@@ -171,7 +190,8 @@
 	dev.off()
 
 # EBImage feature: stack objects then and display objects with default background
-  dev.new(width = 8, height = 5.5, xpos = 5, ypos = 5); plot(img)
+  dev.new(width = 8, height = 5.5, xpos = 5, ypos = 5)
+  plot(img)
   stk <- stackObjects(mask, img)  # apply mask in 'mask' to color image in 'img'
   plot(stk, all = TRUE, nx = 7)
 
@@ -208,7 +228,8 @@
   FH[1:3,]  # Haralick features characterize pixel "texture" 26 parameters
 
 # calculate correlation for Haralick features and display with heatmap 
-  dev.new(width = 5, height = 4, xpos = 5, ypos = 5); heatmap(cor(FH))
+  dev.new(width = 5, height = 4, xpos = 5, ypos = 5)
+  heatmap(cor(FH))
 
 # some correlated, some not...combine all 35 properties linked to intensity
   F <- cbind(FB, FM, FH)
@@ -238,7 +259,8 @@
   blank <- Image(bgCol, dim = c(dim(stk)[1:2], 3), colormode = "Color")
 
 # show original and then plot final form with labels
-  dev.new(width = 8, height = 5.5, xpos = 5, ypos = 5); plot(img)
+  dev.new(width = 8, height = 5.5, xpos = 5, ypos = 5)
+  plot(img)
   plot(combine(stk[,,,ord], blank), all = TRUE, nx = 7)
   xx <- 10 + 0:6 * dim(stk)[1]        # positions along left columns
   yy <- 10 + 0:3 * dim(stk)[2]        # positions along top rows
@@ -264,12 +286,14 @@
 
 # read image, convert to grayscale, crop
   img0 <- readImage("map assignment.jpg")
-  dev.new(width = 5.5, height = 7, xpos = 5, ypos = 5); plot(img0)
+  dev.new(width = 5.5, height = 7, xpos = 5, ypos = 5)
   plot(img0)
+
   img <- channel(img0, "gray")
   img <- img[350:2154, 434:2278]  # predetermined crop coordinates
   dev.off()
-  dev.new(width = 5.5, height = 5.5, xpos = 5, ypos = 5); plot(img)
+  dev.new(width = 5.5, height = 5.5, xpos = 5, ypos = 5)
+  plot(img)
 
 # perform image segmentation with EBImage tools
   x <- normalize(1 - img)   # invert image to 'typical' photo
@@ -283,6 +307,7 @@
   plot(xo)
   plot(xo[730:900, 960:1050], interp = FALSE) # want to find "circles"
 
+################################################################################
 ##
 ## Switch to discussion of perimeter problem in EBImage
 ##
@@ -299,6 +324,8 @@
   plot(squares[581:596, 248:262], interp = FALSE)
   726 * sqrt(2)   # shows failure to measure Euclidean distance
   dev.off()
+################################################################################
+
 ##
 ## relevant to the problem at hand, which is to find little circles
 ##
@@ -405,10 +432,9 @@
 ##
 ###############################################################################
 
-# use code moved from Github repository (devtools needed)
-  if (!require(devtools))
-    warning("'devtools' package must be installed to proceed")
-  load_all(file.path(home, "virustiter"))
+# This requires installation of the virustiter package
+  if (!require("virustiter"))
+    stop("the 'virustiter' package must be installed to proceed")
 
 # set working directory
   setwd(home)
@@ -445,7 +471,8 @@
 
 # calculate area of nuclei to identify excessively small fragments
   area <- lapply(1:2, function(i) computeFeatures.shape(nm0[,,i])[,1])
-  plot(density(unlist(area))); rug(unlist(area))
+  plot(density(unlist(area)))
+  rug(unlist(area))
   abline(v = 75, col = 2) # reasonable break point
   small <- lapply(area, function(v) which(v < 75))
   large <- lapply(area, function(v) which(v >= 75))
@@ -460,10 +487,18 @@
   obj <- paintObjects(nms, N, col = c(2, 2))
   plot(obj, all = T, nx = 1) # all fragments around the edges
 
+# a more effective way to trim the nuclear mask of small and large
+# objects and remove those touching the edge is with trimMask() function:
+  dev.new(width = 7, height = 5.3, xpos = 5, ypos = 5)
+	nmx <- trimMask(nm0, cutoff = c(75, 500), border = 1)
+	plot(colorLabels(nmx), all = TRUE, nx = 1)
+	dev.off()
+
 # nuclear masks used to determine the staining intensity in e1a image
 # faint fluorescence is enhanced by gamma and brightness adjustments
   obj <- paintObjects(nm, E^0.4 - 0.1, col = "magenta")
-  plot(obj, all = TRUE); mtext("Nuclei on E1A (B/C adjusted)", 3)
+  plot(obj, all = TRUE)
+  mtext("Nuclei on E1A (B/C adjusted)", 3)
 
 # loop through each image pair and collect properties in a data frame
   df <- data.frame()
@@ -474,9 +509,11 @@
     df <- rbind(df, data.frame(x = XY[,1], y = XY[,2], area, val))
   }
 
-# identify positive population from densityplot of intensity
-  plot(density(log(df$val))); rug(log(df$val))
-  cutoff <- locator(1, type = "p", pch = 3)$x
+# plot the intensity as a densityplot and then interact with the plot
+# to click on the point that separates the negative from positive cells
+  plot(density(log(df$val)))
+  rug(log(df$val))
+  cutoff <- locator(1, type = "p", pch = 3)$x # waits for the operator
   (cutoff <- exp(cutoff))
 
 # score positive samples in data frame
@@ -490,22 +527,25 @@
 
 # use gamma adjustment of 0.4 with brightness adjustment again
   obj <- paintObjects(nm.pos, y^0.4 - 0.1, col = "gray")
-  plot(obj, all = TRUE); mtext("Positive Cells (B/C adjusted)", 3)
+  plot(obj, all = TRUE)
+  mtext("Positive Cells (B/C adjusted)", 3)
 
 ##
 ## All assembled in collection of code to do this rather automatically
 ##
   fpd <- system.file("extdata", "by_stack/phenoData.csv", package = "virustiter")
-  list.images(f)              # shows 7 additional multi-layered TIF files
-  df <- parseImages(f, display = FALSE) # read all images in enclosing directory
+	path <- dirname(f)          # parental directory
+  list.images(path)           # shows 8 total multi-layered TIF files
+  img <- getImages(path)      # read paired images from each file 
+  df <- parseImages(img)      # read all images in enclosing directory
   (pd <- read.csv(fpd))       # read phenotype data (about infection)
   df <- mergePdata(pd, df)    # join phenotype and image data
-  cut <- getCut(df, mult = 3) # programmatically determine cutoff
-  df <- score(df, cut)        # add positives to data
+  bg <- getBgnd(df)           # programmatically determine cutoff
+  df <- score(df, bg)         # add positives to data
   (res <- tally(df))          # assembly results data frame
   fm <- getFit(res)           # perform Poisson fit with glm()
   fm                          # glm fit
-  plotFit(fm)                 # show fit with results: 162 VP per IU
+  plotFit(fm)                 # show fit with results: but problem with high moi
 
 ##
 ## Done!
