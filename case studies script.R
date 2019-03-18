@@ -256,7 +256,7 @@
 
 # for asthetics. create blank place holder from background value
   (bgCol <- rgb(bg[1], bg[2], bg[3])) # create RGB color string
-  blank <- Image(bgCol, dim = c(dim(stk)[1:2], 3), colormode = "Color")
+  blank <- Image(bgCol, dim = dim(stk)[1:2], colormode = "Color")
 
 # show original and then plot final form with labels
   dev.new(width = 8, height = 5.5, xpos = 5, ypos = 5)
@@ -266,7 +266,7 @@
   yy <- 10 + 0:3 * dim(stk)[2]        # positions along top rows
   pos <- expand.grid(x = xx, y = yy)  # all top left corners
   pos <- head(pos, -1)
-  text(pos$x, pos$y, k$cluster[ord], col = (1:7)[k$cluster[ord]])
+  text(pos$x, pos$y, k$cluster[ord], col = (1:6)[k$cluster[ord]])
   mtext("Sea Urchin Embryo Classification", 3, line = 2.5)
   mtext(paste("Image from:", img.url), side=1, line=3, cex=0.8, adj=0.95)
 
